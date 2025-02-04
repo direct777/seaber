@@ -1,0 +1,76 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17  # Using PostgreSQL 17, you can change this as necessary
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abc123
+          POSTGRES_DB: Seaber
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '23'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: abc123
+          DB_NAME: Seaber
+          TYPEORM_CONNECTION: postgres
+          TYPEORM_HOST: localhost
+          TYPEORM_USERNAME: postgres
+          TYPEORM_PASSWORD: abc123
+          TYPEORM_DATABASE: Seaber
+          TYPEORM_PORT: 5432
+          TYPEORM_SYNCHRONIZE: true
+          TYPEORM_LOGGING: false
+          TYPEORM_ENTITIES: src/entity/**/*.ts
+
+      # Deployment step
+      - name: Deploy to AWS Elastic Beanstalk
+        if: github.ref == 'refs/heads/main' && job.status == 'success'
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: "ts-backend"
+          environment_name: "ts-backend-production"
+          region: "us-west-2"
+          version_label: ${{ github.run_id }}
+          deployment_package: "ts-backend-package.zip"
