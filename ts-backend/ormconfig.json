@@ -1,0 +1,14 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "postgres",
+  "password": "abc123",
+  "database": "Seaber",
+  "synchronize": true,
+  "logging": false,
+  "entities": [
+    "src/entity/**/*.ts"
+  ]
+}
+
