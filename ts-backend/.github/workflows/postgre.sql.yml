@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:17  # Using PostgreSQL 17, you can change this as necessary
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: abc123
-          POSTGRES_DB: Seaber
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: >-
@@ -49,14 +49,14 @@ jobs:
         env:
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_USER: postgres
-          DB_PASSWORD: abc123
-          DB_NAME: Seaber
+          DB_USER: ${{ secrets.POSTGRES_USER }}
+          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_NAME: ${{ secrets.POSTGRES_DB }}
           TYPEORM_CONNECTION: postgres
           TYPEORM_HOST: localhost
-          TYPEORM_USERNAME: postgres
-          TYPEORM_PASSWORD: abc123
-          TYPEORM_DATABASE: Seaber
+          TYPEORM_USERNAME: ${{ secrets.POSTGRES_USER }}
+          TYPEORM_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          TYPEORM_DATABASE: ${{ secrets.POSTGRES_DB }}
           TYPEORM_PORT: 5432
           TYPEORM_SYNCHRONIZE: true
           TYPEORM_LOGGING: false

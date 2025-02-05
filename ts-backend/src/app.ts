@@ -1,20 +1,16 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
-import {  DataSource, DataSourceOptions } from 'typeorm';
+import {  DataSource } from 'typeorm';
 import { Log } from './entity/Log';
-import config from '../ormconfig.json'; 
+import config from './ormconfig';
 
 export const app = express();
 
 app.use(bodyParser.json());
 
-// Define the DataSource with a specific type assertion for PostgreSQL
-export let dataSource = new DataSource({
-    ...(config as DataSourceOptions), // Assure TypeScript that config is of type DataSourceOptions
-    entities: [Log],
-    synchronize: config.synchronize,
-    logging: config.logging
-} as DataSourceOptions);
+// Define the DataSource with a specific type for PostgreSQL
+export let dataSource = new DataSource(config);
 // Function to connect to the database and configure routes
 export const init = async () => {
   await dataSource.initialize();
